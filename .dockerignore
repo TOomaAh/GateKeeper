@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+.github
+
+# Build artifacts
+gatekeeper
+gatekeeper.exe
+gatekeeper-*
+dist/
+*.db
+*.db-shm
+*.db-wal
+
+# Data directories
+data/
+payloads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+LICENSE
+
+# Config
+config.yaml
+*.env
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore

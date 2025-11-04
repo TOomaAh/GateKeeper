@@ -1,0 +1,62 @@
+notifications:
+  telegram:
+    - chat_id: "YOUR_TELEGRAM_CHAT_ID"
+      token: "YOUR_TELEGRAM_BOT_TOKEN"
+      # Optional template (if omitted, default template will be used)
+      # Available variables: {{.Emoji}} {{.IP}} {{.Country}} {{.Score}} {{.Severity}} {{.Blocked}} {{.Path}}
+      # template: |
+      #   {{.Emoji}} *SECURITY ALERT*
+      #
+      #   IP: {{.IP}}
+      #   Country: {{.Country}}
+      #   Score: {{.Score}}/100
+      #   Blocked: {{.Blocked}}
+      #   Path: {{.Path}}
+
+    # Example with custom template
+    # - chat_id: "987654321"
+    #   token: "ANOTHER_BOT_TOKEN"
+    #   template: |
+    #     🚨 *Suspicious access detected*
+    #     IP: {{.IP}} ({{.Country}})
+    #     Risk level: {{.Score}}/100
+    #     Action: {{.Blocked}}
+
+abuseip:
+  api_key: "YOUR_ABUSEIPDB_API_KEY"
+
+unifi:
+  - url: "https://192.168.1.1:8443"
+    username: "admin"
+    password: "your_unifi_password"
+  # You can add multiple UniFi controllers
+  # - url: "https://unifi.example.com:8443"
+  #   username: "admin"
+  #   password: "password"
+
+# Rate limiting (optional, default: 5 requests/minute)
+ratelimit:
+  enabled: true
+  requests_per_minute: 5
+
+# SQLite database (optional, default: ./gatekeeper.db)
+database:
+  path: "./gatekeeper.db"
+
+# Payload saving configuration (optional)
+payload:
+  enabled: true
+  max_size: 1048576  # Maximum payload size in bytes (1MB)
+  directory: "./payloads"  # Directory to save payloads
+
+# Dashboard configuration (optional)
+dashboard:
+  enabled: true
+  port: ":8080"  # Dashboard HTTP port
+
+# IP exclusion list (optional)
+# IPs in this list will be allowed without any checks
+excluded_ips:
+  - "192.168.1.10"
+  - "10.0.0.5"
+  # - "172.16.0.100"
