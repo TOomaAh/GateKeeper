@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 
 	"github.com/TOomaAh/GateKeeper/internal/domain"
@@ -52,6 +53,11 @@ func NewClient(apiKey string) (*Client, error) {
 
 // Check verifies the reputation score of an IP address
 func (c *Client) Check(ip string) (domain.IPScore, string, error) {
+
+	if i := net.ParseIP(ip); i.IsPrivate() || i.IsLoopback() {
+		return 0, "", fmt.Errorf("abuseipdb: ip is private")
+	}
+
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s?ipAddress=%s", AbuseIPDBAPIURL, ip), nil)
 	if err != nil {
 		return 0, "", fmt.Errorf("abuseipdb: failed to create request: %w", err)

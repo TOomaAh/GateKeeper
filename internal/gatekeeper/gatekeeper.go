@@ -18,6 +18,7 @@ import (
 	"github.com/TOomaAh/GateKeeper/internal/database"
 	"github.com/TOomaAh/GateKeeper/internal/domain"
 	"github.com/TOomaAh/GateKeeper/internal/notification"
+	"github.com/TOomaAh/GateKeeper/internal/queue"
 	"github.com/TOomaAh/GateKeeper/internal/ratelimit"
 	"github.com/TOomaAh/GateKeeper/internal/unifi"
 )
@@ -43,6 +44,8 @@ type GateKeeper struct {
 	unifiClients  []*unifi.Client
 	notifier      *notification.MultiNotifier
 	rateLimiter   *ratelimit.IPRateLimiter
+
+	ipScan *queue.IPQueue
 }
 
 // NewGateKeeper creates a new GateKeeper instance
@@ -92,6 +95,7 @@ func NewGateKeeper(cfg *config.Configuration) (*GateKeeper, error) {
 		unifiClients:  unifiClients,
 		notifier:      notifier,
 		rateLimiter:   rateLimiter,
+		ipScan:        queue.NewIPQueue(),
 	}, nil
 }
 
@@ -133,6 +137,9 @@ func (g *GateKeeper) isExcludedIP(ip string) bool {
 func (g *GateKeeper) handler(w http.ResponseWriter, r *http.Request) {
 	ip := g.extractClientIP(r)
 
+	mutex := g.ipScan.Get(ip)
+	mutex.Lock()
+
 	if g.isExcludedIP(ip) {
 		log.Printf("IP %s is excluded, allowing access", ip)
 		w.WriteHeader(http.StatusOK)
@@ -149,6 +156,8 @@ func (g *GateKeeper) handler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Direct IP access detected: IP=%s, Path=%s", ip, path)
 
 	ipInfo := g.getOrCreateIPInfo(ip, path, r)
+
+	mutex.Unlock()
 
 	g.notifier.Notify(ipInfo)
 
